@@ -35,30 +35,30 @@
 <script>
     // 1. Setup the data (Normalized to 100% per year)
     const data = [
-        { year: 2010, "1. Tourism and visitor economy": 0.1014, "2. Environment & climate challenges": 0.0468, "3. Resort development and land use regulation": 0.0771, "4. Housing and workforce accommodation": 0.1980, "5. Municipal service and administration / destination governance": 0.5767 },
-        { year: 2011, "1. Tourism and visitor economy": 0.3271, "2. Environment & climate challenges": 0.0397, "3. Resort development and land use regulation": 0.1147, "4. Housing and workforce accommodation": 0.0786, "5. Municipal service and administration / destination governance": 0.4399 },
-        { year: 2012, "1. Tourism and visitor economy": 0.2448, "2. Environment & climate challenges": 0.0270, "3. Resort development and land use regulation": 0.2178, "4. Housing and workforce accommodation": 0.0176, "5. Municipal service and administration / destination governance": 0.4928 },
-        { year: 2013, "1. Tourism and visitor economy": 0.0566, "2. Environment & climate challenges": 0.2797, "3. Resort development and land use regulation": 0.2763, "4. Housing and workforce accommodation": 0.0208, "5. Municipal service and administration / destination governance": 0.3666 },
-        { year: 2014, "1. Tourism and visitor economy": 0.0856, "2. Environment & climate challenges": 0.1107, "3. Resort development and land use regulation": 0.1556, "4. Housing and workforce accommodation": 0.0347, "5. Municipal service and administration / destination governance": 0.6134 },
-        { year: 2015, "1. Tourism and visitor economy": 0.0724, "2. Environment & climate challenges": 0.3320, "3. Resort development and land use regulation": 0.1435, "4. Housing and workforce accommodation": 0.0217, "5. Municipal service and administration / destination governance": 0.4304 },
-        { year: 2016, "1. Tourism and visitor economy": 0.0531, "2. Environment & climate challenges": 0.2095, "3. Resort development and land use regulation": 0.5119, "4. Housing and workforce accommodation": 0.0095, "5. Municipal service and administration / destination governance": 0.2160 },
-        { year: 2017, "1. Tourism and visitor economy": 0.0250, "2. Environment & climate challenges": 0.4239, "3. Resort development and land use regulation": 0.1960, "4. Housing and workforce accommodation": 0.0935, "5. Municipal service and administration / destination governance": 0.2616 },
-        { year: 2018, "1. Tourism and visitor economy": 0.0311, "2. Environment & climate challenges": 0.5178, "3. Resort development and land use regulation": 0.0881, "4. Housing and workforce accommodation": 0.0123, "5. Municipal service and administration / destination governance": 0.3507 },
-        { year: 2019, "1. Tourism and visitor economy": 0.0804, "2. Environment & climate challenges": 0.2007, "3. Resort development and land use regulation": 0.4636, "4. Housing and workforce accommodation": 0.0063, "5. Municipal service and administration / destination governance": 0.2490 },
-        { year: 2020, "1. Tourism and visitor economy": 0.0163, "2. Environment & climate challenges": 0.1300, "3. Resort development and land use regulation": 0.7405, "4. Housing and workforce accommodation": 0.0070, "5. Municipal service and administration / destination governance": 0.1062 },
-        { year: 2021, "1. Tourism and visitor economy": 0.0160, "2. Environment & climate challenges": 0.1870, "3. Resort development and land use regulation": 0.6999, "4. Housing and workforce accommodation": 0.0068, "5. Municipal service and administration / destination governance": 0.0903 },
-        { year: 2022, "1. Tourism and visitor economy": 0.0138, "2. Environment & climate challenges": 0.1428, "3. Resort development and land use regulation": 0.7179, "4. Housing and workforce accommodation": 0.0075, "5. Municipal service and administration / destination governance": 0.1180 },
-        { year: 2023, "1. Tourism and visitor economy": 0.0264, "2. Environment & climate challenges": 0.1568, "3. Resort development and land use regulation": 0.7386, "4. Housing and workforce accommodation": 0.0105, "5. Municipal service and administration / destination governance": 0.0677 },
-        { year: 2024, "1. Tourism and visitor economy": 0.0200, "2. Environment & climate challenges": 0.1747, "3. Resort development and land use regulation": 0.7283, "4. Housing and workforce accommodation": 0.0074, "5. Municipal service and administration / destination governance": 0.0696 },
-        { year: 2025, "1. Tourism and visitor economy": 0.0302, "2. Environment & climate challenges": 0.1609, "3. Resort development and land use regulation": 0.6950, "4. Housing and workforce accommodation": 0.0053, "5. Municipal service and administration / destination governance": 0.1086 }
+        {"year": 2010, "1. Community Leisure and Recreation": 0.114, "2. Natural and Environmental Assets": 0.0283, "3. Municipal Service and Operations": 0.0179, "4. Housing and Spatial Planning": 0.267, "5. Finance, Policy and Administrative Procedures": 0.5727}, 
+        {"year": 2011, "1. Community Leisure and Recreation": 0.2493, "2. Natural and Environmental Assets": 0.0736, "3. Municipal Service and Operations": 0.0997, "4. Housing and Spatial Planning": 0.17, "5. Finance, Policy and Administrative Procedures": 0.4074}, 
+        {"year": 2012, "1. Community Leisure and Recreation": 0.1236, "2. Natural and Environmental Assets": 0.0677, "3. Municipal Service and Operations": 0.1771, "4. Housing and Spatial Planning": 0.1153, "5. Finance, Policy and Administrative Procedures": 0.5163}, 
+        {"year": 2013, "1. Community Leisure and Recreation": 0.0993, "2. Natural and Environmental Assets": 0.0694, "3. Municipal Service and Operations": 0.0347, "4. Housing and Spatial Planning": 0.111, "5. Finance, Policy and Administrative Procedures": 0.6855}, 
+        {"year": 2014, "1. Community Leisure and Recreation": 0.0423, "2. Natural and Environmental Assets": 0.07, "3. Municipal Service and Operations": 0.0878, "4. Housing and Spatial Planning": 0.1672, "5. Finance, Policy and Administrative Procedures": 0.6328}, 
+        {"year": 2015, "1. Community Leisure and Recreation": 0.0586, "2. Natural and Environmental Assets": 0.0657, "3. Municipal Service and Operations": 0.0938, "4. Housing and Spatial Planning": 0.1156, "5. Finance, Policy and Administrative Procedures": 0.6663}, 
+        {"year": 2016, "1. Community Leisure and Recreation": 0.0336, "2. Natural and Environmental Assets": 0.0466, "3. Municipal Service and Operations": 0.0468, "4. Housing and Spatial Planning": 0.5047, "5. Finance, Policy and Administrative Procedures": 0.3682}, 
+        {"year": 2017, "1. Community Leisure and Recreation": 0.0172, "2. Natural and Environmental Assets": 0.0904, "3. Municipal Service and Operations": 0.019, "4. Housing and Spatial Planning": 0.2594, "5. Finance, Policy and Administrative Procedures": 0.614}, 
+        {"year": 2018, "1. Community Leisure and Recreation": 0.0429, "2. Natural and Environmental Assets": 0.1456, "3. Municipal Service and Operations": 0.0301, "4. Housing and Spatial Planning": 0.0881, "5. Finance, Policy and Administrative Procedures": 0.6933}, 
+        {"year": 2019, "1. Community Leisure and Recreation": 0.0876, "2. Natural and Environmental Assets": 0.0576, "3. Municipal Service and Operations": 0.0224, "4. Housing and Spatial Planning": 0.4584, "5. Finance, Policy and Administrative Procedures": 0.374}, 
+        {"year": 2020, "1. Community Leisure and Recreation": 0.0165, "2. Natural and Environmental Assets": 0.0164, "3. Municipal Service and Operations": 0.0199, "4. Housing and Spatial Planning": 0.7425, "5. Finance, Policy and Administrative Procedures": 0.2047}, 
+        {"year": 2021, "1. Community Leisure and Recreation": 0.0123, "2. Natural and Environmental Assets": 0.0265, "3. Municipal Service and Operations": 0.0154, "4. Housing and Spatial Planning": 0.7021, "5. Finance, Policy and Administrative Procedures": 0.2437}, 
+        {"year": 2022, "1. Community Leisure and Recreation": 0.0098, "2. Natural and Environmental Assets": 0.0218, "3. Municipal Service and Operations": 0.0104, "4. Housing and Spatial Planning": 0.7202, "5. Finance, Policy and Administrative Procedures": 0.2378}, 
+        {"year": 2023, "1. Community Leisure and Recreation": 0.0147, "2. Natural and Environmental Assets": 0.04, "3. Municipal Service and Operations": 0.0184, "4. Housing and Spatial Planning": 0.7427, "5. Finance, Policy and Administrative Procedures": 0.1842}, 
+        {"year": 2024, "1. Community Leisure and Recreation": 0.0154, "2. Natural and Environmental Assets": 0.0453, "3. Municipal Service and Operations": 0.0137, "4. Housing and Spatial Planning": 0.7266, "5. Finance, Policy and Administrative Procedures": 0.199}, 
+        {"year": 2025, "1. Community Leisure and Recreation": 0.0265, "2. Natural and Environmental Assets": 0.0621, "3. Municipal Service and Operations": 0.01, "4. Housing and Spatial Planning": 0.6937, "5. Finance, Policy and Administrative Procedures": 0.2078}
     ];
 
     const keys = [
-        "1. Tourism and visitor economy",
-        "2. Environment & climate challenges",
-        "3. Resort development and land use regulation",
-        "4. Housing and workforce accommodation",
-        "5. Municipal service and administration / destination governance"
+        "1. Community Leisure and Recreation", 
+        "2. Natural and Environmental Assets", 
+        "3. Municipal Service and Operations", 
+        "4. Housing and Spatial Planning", 
+        "5. Finance, Policy and Administrative Procedures"
     ];
 
     // 2. Setup SVG dimensions
