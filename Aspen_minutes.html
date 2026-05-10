@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aspen Minutes Theme Trends (2010 - 2025)</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body { font-family: sans-serif; background-color: #f9f9f9; padding: 20px; }
+        #chart-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 1000px; margin: auto; position: relative;}
+        .tooltip {
+            position: absolute;
+            text-align: left;
+            padding: 8px 12px;
+            font-size: 14px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            border-radius: 4px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        h2 { text-align: center; color: #333; }
+        .legend { font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<div id="chart-container">
+    <h2>Aspen Minutes Theme Trends (2010 - 2025)</h2>
+    <div id="chart"></div>
+    <div id="tooltip" class="tooltip"></div>
+</div>
+
+<script>
+    // 1. Setup the data (Normalized to 100% per year)
+    const data = [
+        {"year": 2010, "1. Council Policymaking & Policy Actions": 0.5217, "2. Housing, Lodging & Tourism Business": 0.094, "3. Civic Infrastructure & Community Facilities": 0.1867, "4. Public Health, Environment & Sustainability": 0.0759, "5. Municipal Regulation, Finance & Budget": 0.1218}, 
+        {"year": 2011, "1. Council Policymaking & Policy Actions": 0.5655, "2. Housing, Lodging & Tourism Business": 0.1204, "3. Civic Infrastructure & Community Facilities": 0.0314, "4. Public Health, Environment & Sustainability": 0.145, "5. Municipal Regulation, Finance & Budget": 0.1377}, 
+        {"year": 2012, "1. Council Policymaking & Policy Actions": 0.505, "2. Housing, Lodging & Tourism Business": 0.2268, "3. Civic Infrastructure & Community Facilities": 0.1025, "4. Public Health, Environment & Sustainability": 0.0448, "5. Municipal Regulation, Finance & Budget": 0.1209}, 
+        {"year": 2013, "1. Council Policymaking & Policy Actions": 0.488, "2. Housing, Lodging & Tourism Business": 0.2592, "3. Civic Infrastructure & Community Facilities": 0.094, "4. Public Health, Environment & Sustainability": 0.0126, "5. Municipal Regulation, Finance & Budget": 0.1463}, 
+        {"year": 2014, "1. Council Policymaking & Policy Actions": 0.4861, "2. Housing, Lodging & Tourism Business": 0.359, "3. Civic Infrastructure & Community Facilities": 0.0588, "4. Public Health, Environment & Sustainability": 0.0164, "5. Municipal Regulation, Finance & Budget": 0.0797}, 
+        {"year": 2015, "1. Council Policymaking & Policy Actions": 0.5001, "2. Housing, Lodging & Tourism Business": 0.3006, "3. Civic Infrastructure & Community Facilities": 0.0371, "4. Public Health, Environment & Sustainability": 0.0136, "5. Municipal Regulation, Finance & Budget": 0.1487}, 
+        {"year": 2016, "1. Council Policymaking & Policy Actions": 0.511, "2. Housing, Lodging & Tourism Business": 0.3195, "3. Civic Infrastructure & Community Facilities": 0.0809, "4. Public Health, Environment & Sustainability": 0.0125, "5. Municipal Regulation, Finance & Budget": 0.0762}, 
+        {"year": 2017, "1. Council Policymaking & Policy Actions": 0.5959, "2. Housing, Lodging & Tourism Business": 0.1826, "3. Civic Infrastructure & Community Facilities": 0.094, "4. Public Health, Environment & Sustainability": 0.0195, "5. Municipal Regulation, Finance & Budget": 0.108}, 
+        {"year": 2018, "1. Council Policymaking & Policy Actions": 0.5978, "2. Housing, Lodging & Tourism Business": 0.1029, "3. Civic Infrastructure & Community Facilities": 0.1354, "4. Public Health, Environment & Sustainability": 0.0209, "5. Municipal Regulation, Finance & Budget": 0.143}, 
+        {"year": 2019, "1. Council Policymaking & Policy Actions": 0.6597, "2. Housing, Lodging & Tourism Business": 0.0996, "3. Civic Infrastructure & Community Facilities": 0.1132, "4. Public Health, Environment & Sustainability": 0.0248, "5. Municipal Regulation, Finance & Budget": 0.1027}, 
+        {"year": 2020, "1. Council Policymaking & Policy Actions": 0.6685, "2. Housing, Lodging & Tourism Business": 0.0647, "3. Civic Infrastructure & Community Facilities": 0.0269, "4. Public Health, Environment & Sustainability": 0.1762, "5. Municipal Regulation, Finance & Budget": 0.0637}, 
+        {"year": 2021, "1. Council Policymaking & Policy Actions": 0.6478, "2. Housing, Lodging & Tourism Business": 0.1478, "3. Civic Infrastructure & Community Facilities": 0.0313, "4. Public Health, Environment & Sustainability": 0.0984, "5. Municipal Regulation, Finance & Budget": 0.0747}, 
+        {"year": 2022, "1. Council Policymaking & Policy Actions": 0.7695, "2. Housing, Lodging & Tourism Business": 0.0806, "3. Civic Infrastructure & Community Facilities": 0.0436, "4. Public Health, Environment & Sustainability": 0.0515, "5. Municipal Regulation, Finance & Budget": 0.0547}, 
+        {"year": 2023, "1. Council Policymaking & Policy Actions": 0.8548, "2. Housing, Lodging & Tourism Business": 0.0427, "3. Civic Infrastructure & Community Facilities": 0.0501, "4. Public Health, Environment & Sustainability": 0.0114, "5. Municipal Regulation, Finance & Budget": 0.041}, 
+        {"year": 2024, "1. Council Policymaking & Policy Actions": 0.8294, "2. Housing, Lodging & Tourism Business": 0.0361, "3. Civic Infrastructure & Community Facilities": 0.0387, "4. Public Health, Environment & Sustainability": 0.0115, "5. Municipal Regulation, Finance & Budget": 0.0843}, 
+        {"year": 2025, "1. Council Policymaking & Policy Actions": 0.7502, "2. Housing, Lodging & Tourism Business": 0.067, "3. Civic Infrastructure & Community Facilities": 0.1089, "4. Public Health, Environment & Sustainability": 0.02, "5. Municipal Regulation, Finance & Budget": 0.0539}
+    ];
+
+    const keys = [
+        "1. Council Policymaking & Policy Actions", 
+        "2. Housing, Lodging & Tourism Business", 
+        "3. Civic Infrastructure & Community Facilities", 
+        "4. Public Health, Environment & Sustainability", 
+        "5. Municipal Regulation, Finance & Budget"
+    ];
+
+    // 2. Setup SVG dimensions
+    const width = 1000;
+    const height = 500;
+    const margin = { top: 20, right: 300, bottom: 40, left: 60 };
+
+    const svg = d3.select("#chart").append("svg")
+        .attr("viewBox", [0, 0, width, height])
+        .style("max-width", "100%")
+        .style("height", "auto");
+
+    // 3. Setup Scales
+    const x = d3.scaleLinear()
+        .domain(d3.extent(data, d => d.year))
+        .range([margin.left, width - margin.right]);
+
+    const color = d3.scaleOrdinal()
+        .domain(keys)
+        .range(["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854"]);
+
+    // 4. Setup Stack with WIGGLE offset
+    const stack = d3.stack()
+        .keys(keys)
+        .order(d3.stackOrderInsideOut)
+        .offset(d3.stackOffsetWiggle);
+
+    const series = stack(data);
+
+    // 5. Y-Scale needs dynamic extent due to Wiggle Offset
+    const y = d3.scaleLinear()
+        .domain([d3.min(series, d => d3.min(d, d => d[0])), d3.max(series, d => d3.max(d, d => d[1]))])
+        .range([height - margin.bottom, margin.top]);
+
+    // 6. Draw Axes
+    svg.append("g")
+        .attr("transform", `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(x).ticks(16).tickFormat(d3.format("d")))
+        .call(g => g.select(".domain").remove());
+
+    svg.append("g")
+        .attr("transform", `translate(${margin.left},0)`)
+        .call(d3.axisLeft(y).ticks(5))
+        .call(g => g.select(".domain").remove())
+        .call(g => g.append("text")
+            .attr("x", -margin.left)
+            .attr("y", 10)
+            .attr("fill", "currentColor")
+            .attr("text-anchor", "start")
+            .text("Theme Weight Distribution"));
+
+    // 7. Draw Stream Area with CATMULL-ROM curve
+    const area = d3.area()
+        .x(d => x(d.data.year))
+        .y0(d => y(d[0]))
+        .y1(d => y(d[1]))
+        .curve(d3.curveCatmullRom);
+
+    const tooltip = d3.select("#tooltip");
+
+    const paths = svg.append("g")
+        .selectAll("path")
+        .data(series)
+        .join("path")
+        .attr("fill", d => color(d.key))
+        .attr("d", area)
+        .style("cursor", "pointer")
+        .on("mousemove", function(event, d) {
+            paths.style("opacity", 0.2);
+            d3.select(this).style("opacity", 1);
+
+            const [mouseX, mouseY] = d3.pointer(event);
+            const year = Math.round(x.invert(mouseX));
+            
+            const yearData = data.find(item => item.year === year);
+            if(yearData) {
+                const value = yearData[d.key];
+                tooltip.style("opacity", 1)
+                    .html(`<strong>Year:</strong> ${year}<br><strong>Theme:</strong> ${d.key}<br><strong>Share:</strong> ${(value * 100).toFixed(1)}%`)
+                    .style("left", (event.pageX + 15) + "px")
+                    .style("top", (event.pageY - 28) + "px");
+            }
+        })
+        .on("mouseout", function() {
+            paths.style("opacity", 1);
+            tooltip.style("opacity", 0);
+        });
+
+    // 8. Draw Legend
+    const legend = svg.append("g")
+        .attr("transform", `translate(${width - margin.right + 20}, ${margin.top})`)
+        .attr("class", "legend")
+        .selectAll("g")
+        .data(keys.slice().reverse())
+        .join("g")
+        .attr("transform", (d, i) => `translate(0, ${i * 25})`);
+
+    legend.append("rect")
+        .attr("width", 15)
+        .attr("height", 15)
+        .attr("fill", color);
+
+    legend.append("text")
+        .attr("x", 24)
+        .attr("y", 8)
+        .attr("dy", "0.32em")
+        .text(d => d)
+        .style("font-size", "12px")
+        .call(wrap, 250); 
+
+    function wrap(text, width) {
+        text.each(function() {
+            let text = d3.select(this),
+                words = text.text().split(/\s+/).reverse(),
+                word,
+                line = [],
+                lineNumber = 0,
+                lineHeight = 1.1,
+                y = text.attr("y"),
+                dy = parseFloat(text.attr("dy")),
+                tspan = text.text(null).append("tspan").attr("x", 24).attr("y", y).attr("dy", dy + "em");
+            while (word = words.pop()) {
+                line.push(word);
+                tspan.text(line.join(" "));
+                if (tspan.node().getComputedTextLength() > width) {
+                    line.pop();
+                    tspan.text(line.join(" "));
+                    line = [word];
+                    tspan = text.append("tspan").attr("x", 24).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                }
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
