@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aspen Agenda Theme Trends (2010 - 2025)</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body { font-family: sans-serif; background-color: #f9f9f9; padding: 20px; }
+        #chart-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 1000px; margin: auto; position: relative;}
+        .tooltip {
+            position: absolute;
+            text-align: left;
+            padding: 8px 12px;
+            font-size: 14px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            border-radius: 4px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        h2 { text-align: center; color: #333; }
+        .legend { font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<div id="chart-container">
+    <h2>Aspen Agenda Theme Trends (2010 - 2025)</h2>
+    <div id="chart"></div>
+    <div id="tooltip" class="tooltip"></div>
+</div>
+
+<script>
+    // 1. Setup the data (Normalized to 100% per year)
+    const data = [
+        {"year": 2010, "1. Affordable Housing & Real Estate Development": 0.0692, "2. Environmental Resource Management": 0.0669, "3. Zoning & Historic Preservation": 0.1118, "4. Transportation Infrastructure & Management": 0.1507, "5. Governance Services & Community Engagement": 0.6014}, 
+        {"year": 2011, "1. Affordable Housing & Real Estate Development": 0.0721, "2. Environmental Resource Management": 0.0712, "3. Zoning & Historic Preservation": 0.1156, "4. Transportation Infrastructure & Management": 0.1225, "5. Governance Services & Community Engagement": 0.6186}, 
+        {"year": 2012, "1. Affordable Housing & Real Estate Development": 0.0616, "2. Environmental Resource Management": 0.0512, "3. Zoning & Historic Preservation": 0.1176, "4. Transportation Infrastructure & Management": 0.1491, "5. Governance Services & Community Engagement": 0.6204}, 
+        {"year": 2013, "1. Affordable Housing & Real Estate Development": 0.0586, "2. Environmental Resource Management": 0.1127, "3. Zoning & Historic Preservation": 0.1959, "4. Transportation Infrastructure & Management": 0.0902, "5. Governance Services & Community Engagement": 0.5426}, 
+        {"year": 2014, "1. Affordable Housing & Real Estate Development": 0.0504, "2. Environmental Resource Management": 0.115, "3. Zoning & Historic Preservation": 0.1122, "4. Transportation Infrastructure & Management": 0.1216, "5. Governance Services & Community Engagement": 0.6007}, 
+        {"year": 2015, "1. Affordable Housing & Real Estate Development": 0.1482, "2. Environmental Resource Management": 0.0863, "3. Zoning & Historic Preservation": 0.1276, "4. Transportation Infrastructure & Management": 0.1802, "5. Governance Services & Community Engagement": 0.4578}, 
+        {"year": 2016, "1. Affordable Housing & Real Estate Development": 0.1746, "2. Environmental Resource Management": 0.2529, "3. Zoning & Historic Preservation": 0.1075, "4. Transportation Infrastructure & Management": 0.1691, "5. Governance Services & Community Engagement": 0.2959}, 
+        {"year": 2017, "1. Affordable Housing & Real Estate Development": 0.0752, "2. Environmental Resource Management": 0.1019, "3. Zoning & Historic Preservation": 0.1707, "4. Transportation Infrastructure & Management": 0.1518, "5. Governance Services & Community Engagement": 0.5003}, 
+        {"year": 2018, "1. Affordable Housing & Real Estate Development": 0.0591, "2. Environmental Resource Management": 0.1061, "3. Zoning & Historic Preservation": 0.1046, "4. Transportation Infrastructure & Management": 0.1276, "5. Governance Services & Community Engagement": 0.6026}, 
+        {"year": 2019, "1. Affordable Housing & Real Estate Development": 0.0632, "2. Environmental Resource Management": 0.0552, "3. Zoning & Historic Preservation": 0.0885, "4. Transportation Infrastructure & Management": 0.0926, "5. Governance Services & Community Engagement": 0.7004}, 
+        {"year": 2020, "1. Affordable Housing & Real Estate Development": 0.0165, "2. Environmental Resource Management": 0.0362, "3. Zoning & Historic Preservation": 0.1216, "4. Transportation Infrastructure & Management": 0.1021, "5. Governance Services & Community Engagement": 0.7236}, 
+        {"year": 2021, "1. Affordable Housing & Real Estate Development": 0.0374, "2. Environmental Resource Management": 0.0576, "3. Zoning & Historic Preservation": 0.0845, "4. Transportation Infrastructure & Management": 0.1191, "5. Governance Services & Community Engagement": 0.7014}, 
+        {"year": 2022, "1. Affordable Housing & Real Estate Development": 0.0472, "2. Environmental Resource Management": 0.0675, "3. Zoning & Historic Preservation": 0.1349, "4. Transportation Infrastructure & Management": 0.0625, "5. Governance Services & Community Engagement": 0.6879}, 
+        {"year": 2023, "1. Affordable Housing & Real Estate Development": 0.0838, "2. Environmental Resource Management": 0.0462, "3. Zoning & Historic Preservation": 0.0696, "4. Transportation Infrastructure & Management": 0.0829, "5. Governance Services & Community Engagement": 0.7175}, 
+        {"year": 2024, "1. Affordable Housing & Real Estate Development": 0.0451, "2. Environmental Resource Management": 0.0521, "3. Zoning & Historic Preservation": 0.0756, "4. Transportation Infrastructure & Management": 0.1267, "5. Governance Services & Community Engagement": 0.7004}, 
+        {"year": 2025, "1. Affordable Housing & Real Estate Development": 0.1138, "2. Environmental Resource Management": 0.0444, "3. Zoning & Historic Preservation": 0.0442, "4. Transportation Infrastructure & Management": 0.1578, "5. Governance Services & Community Engagement": 0.6398}
+    ];
+
+    const keys = [
+        "1. Affordable Housing & Real Estate Development", 
+        "2. Environmental Resource Management", 
+        "3. Zoning & Historic Preservation", 
+        "4. Transportation Infrastructure & Management", 
+        "5. Governance Services & Community Engagement"
+    ];
+
+    // 2. Setup SVG dimensions
+    const width = 1000;
+    const height = 500;
+    const margin = { top: 20, right: 300, bottom: 40, left: 60 };
+
+    const svg = d3.select("#chart").append("svg")
+        .attr("viewBox", [0, 0, width, height])
+        .style("max-width", "100%")
+        .style("height", "auto");
+
+    // 3. Setup Scales
+    const x = d3.scaleLinear()
+        .domain(d3.extent(data, d => d.year))
+        .range([margin.left, width - margin.right]);
+
+    const color = d3.scaleOrdinal()
+        .domain(keys)
+        .range(["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854"]);
+
+    // 4. Setup Stack with WIGGLE offset
+    const stack = d3.stack()
+        .keys(keys)
+        .order(d3.stackOrderInsideOut)
+        .offset(d3.stackOffsetWiggle);
+
+    const series = stack(data);
+
+    // 5. Y-Scale needs dynamic extent due to Wiggle Offset
+    const y = d3.scaleLinear()
+        .domain([d3.min(series, d => d3.min(d, d => d[0])), d3.max(series, d => d3.max(d, d => d[1]))])
+        .range([height - margin.bottom, margin.top]);
+
+    // 6. Draw Axes
+    svg.append("g")
+        .attr("transform", `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(x).ticks(16).tickFormat(d3.format("d")))
+        .call(g => g.select(".domain").remove());
+
+    svg.append("g")
+        .attr("transform", `translate(${margin.left},0)`)
+        .call(d3.axisLeft(y).ticks(5))
+        .call(g => g.select(".domain").remove())
+        .call(g => g.append("text")
+            .attr("x", -margin.left)
+            .attr("y", 10)
+            .attr("fill", "currentColor")
+            .attr("text-anchor", "start")
+            .text("Theme Weight Distribution"));
+
+    // 7. Draw Stream Area with CATMULL-ROM curve
+    const area = d3.area()
+        .x(d => x(d.data.year))
+        .y0(d => y(d[0]))
+        .y1(d => y(d[1]))
+        .curve(d3.curveCatmullRom);
+
+    const tooltip = d3.select("#tooltip");
+
+    const paths = svg.append("g")
+        .selectAll("path")
+        .data(series)
+        .join("path")
+        .attr("fill", d => color(d.key))
+        .attr("d", area)
+        .style("cursor", "pointer")
+        .on("mousemove", function(event, d) {
+            paths.style("opacity", 0.2);
+            d3.select(this).style("opacity", 1);
+
+            const [mouseX, mouseY] = d3.pointer(event);
+            const year = Math.round(x.invert(mouseX));
+            
+            const yearData = data.find(item => item.year === year);
+            if(yearData) {
+                const value = yearData[d.key];
+                tooltip.style("opacity", 1)
+                    .html(`<strong>Year:</strong> ${year}<br><strong>Theme:</strong> ${d.key}<br><strong>Share:</strong> ${(value * 100).toFixed(1)}%`)
+                    .style("left", (event.pageX + 15) + "px")
+                    .style("top", (event.pageY - 28) + "px");
+            }
+        })
+        .on("mouseout", function() {
+            paths.style("opacity", 1);
+            tooltip.style("opacity", 0);
+        });
+
+    // 8. Draw Legend
+    const legend = svg.append("g")
+        .attr("transform", `translate(${width - margin.right + 20}, ${margin.top})`)
+        .attr("class", "legend")
+        .selectAll("g")
+        .data(keys.slice().reverse())
+        .join("g")
+        .attr("transform", (d, i) => `translate(0, ${i * 25})`);
+
+    legend.append("rect")
+        .attr("width", 15)
+        .attr("height", 15)
+        .attr("fill", color);
+
+    legend.append("text")
+        .attr("x", 24)
+        .attr("y", 8)
+        .attr("dy", "0.32em")
+        .text(d => d)
+        .style("font-size", "12px")
+        .call(wrap, 250); 
+
+    function wrap(text, width) {
+        text.each(function() {
+            let text = d3.select(this),
+                words = text.text().split(/\s+/).reverse(),
+                word,
+                line = [],
+                lineNumber = 0,
+                lineHeight = 1.1,
+                y = text.attr("y"),
+                dy = parseFloat(text.attr("dy")),
+                tspan = text.text(null).append("tspan").attr("x", 24).attr("y", y).attr("dy", dy + "em");
+            while (word = words.pop()) {
+                line.push(word);
+                tspan.text(line.join(" "));
+                if (tspan.node().getComputedTextLength() > width) {
+                    line.pop();
+                    tspan.text(line.join(" "));
+                    line = [word];
+                    tspan = text.append("tspan").attr("x", 24).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                }
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
