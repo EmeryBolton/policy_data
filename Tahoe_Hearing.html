@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tahoe Hearing Theme Trends (2010 - 2025)</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body { font-family: sans-serif; background-color: #f9f9f9; padding: 20px; }
+        #chart-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 1000px; margin: auto; position: relative;}
+        .tooltip {
+            position: absolute;
+            text-align: left;
+            padding: 8px 12px;
+            font-size: 14px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            border-radius: 4px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        h2 { text-align: center; color: #333; }
+        .legend { font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<div id="chart-container">
+    <h2>Tahoe Hearing Theme Trends (2010 - 2025)</h2>
+    <div id="chart"></div>
+    <div id="tooltip" class="tooltip"></div>
+</div>
+
+<script>
+    // 1. Setup the data (Normalized to 100% per year)
+    const data = [
+        {"year": 2010, "1. Environmental Management & Conservation": 0.4895, "2. Regulatory Compliance Permitting & Legal Affairs": 0.1631, "3. Infrastructure Development": 0.0282, "4. Land Coverage, Site Engineering & Architectural Design": 0.2687, "5. Planning & Historic Heritage": 0.0505}, 
+        {"year": 2011, "1. Environmental Management & Conservation": 0.1175, "2. Regulatory Compliance Permitting & Legal Affairs": 0.5483, "3. Infrastructure Development": 0.0778, "4. Land Coverage, Site Engineering & Architectural Design": 0.1704, "5. Planning & Historic Heritage": 0.0859}, 
+        {"year": 2012, "1. Environmental Management & Conservation": 0.3557, "2. Regulatory Compliance Permitting & Legal Affairs": 0.3221, "3. Infrastructure Development": 0.0937, "4. Land Coverage, Site Engineering & Architectural Design": 0.1524, "5. Planning & Historic Heritage": 0.0762}, 
+        {"year": 2013, "1. Environmental Management & Conservation": 0.4365, "2. Regulatory Compliance Permitting & Legal Affairs": 0.3062, "3. Infrastructure Development": 0.0452, "4. Land Coverage, Site Engineering & Architectural Design": 0.1175, "5. Planning & Historic Heritage": 0.0946}, 
+        {"year": 2014, "1. Environmental Management & Conservation": 0.6115, "2. Regulatory Compliance Permitting & Legal Affairs": 0.2818, "3. Infrastructure Development": 0.0148, "4. Land Coverage, Site Engineering & Architectural Design": 0.0668, "5. Planning & Historic Heritage": 0.0251}, 
+        {"year": 2015, "1. Environmental Management & Conservation": 0.5201, "2. Regulatory Compliance Permitting & Legal Affairs": 0.3192, "3. Infrastructure Development": 0.0346, "4. Land Coverage, Site Engineering & Architectural Design": 0.0703, "5. Planning & Historic Heritage": 0.0557}, 
+        {"year": 2016, "1. Environmental Management & Conservation": 0.2952, "2. Regulatory Compliance Permitting & Legal Affairs": 0.4033, "3. Infrastructure Development": 0.0295, "4. Land Coverage, Site Engineering & Architectural Design": 0.1432, "5. Planning & Historic Heritage": 0.1288}, 
+        {"year": 2017, "1. Environmental Management & Conservation": 0.4098, "2. Regulatory Compliance Permitting & Legal Affairs": 0.331, "3. Infrastructure Development": 0.0746, "4. Land Coverage, Site Engineering & Architectural Design": 0.1056, "5. Planning & Historic Heritage": 0.079}, 
+        {"year": 2018, "1. Environmental Management & Conservation": 0.3769, "2. Regulatory Compliance Permitting & Legal Affairs": 0.3734, "3. Infrastructure Development": 0.0681, "4. Land Coverage, Site Engineering & Architectural Design": 0.0789, "5. Planning & Historic Heritage": 0.1026}, 
+        {"year": 2019, "1. Environmental Management & Conservation": 0.3471, "2. Regulatory Compliance Permitting & Legal Affairs": 0.4241, "3. Infrastructure Development": 0.0653, "4. Land Coverage, Site Engineering & Architectural Design": 0.0725, "5. Planning & Historic Heritage": 0.0911}, 
+        {"year": 2020, "1. Environmental Management & Conservation": 0.3117, "2. Regulatory Compliance Permitting & Legal Affairs": 0.4235, "3. Infrastructure Development": 0.0326, "4. Land Coverage, Site Engineering & Architectural Design": 0.1233, "5. Planning & Historic Heritage": 0.1089}, 
+        {"year": 2021, "1. Environmental Management & Conservation": 0.3617, "2. Regulatory Compliance Permitting & Legal Affairs": 0.2855, "3. Infrastructure Development": 0.1304, "4. Land Coverage, Site Engineering & Architectural Design": 0.1265, "5. Planning & Historic Heritage": 0.0958}, 
+        {"year": 2022, "1. Environmental Management & Conservation": 0.3466, "2. Regulatory Compliance Permitting & Legal Affairs": 0.3842, "3. Infrastructure Development": 0.0734, "4. Land Coverage, Site Engineering & Architectural Design": 0.0855, "5. Planning & Historic Heritage": 0.1102}, 
+        {"year": 2023, "1. Environmental Management & Conservation": 0.3997, "2. Regulatory Compliance Permitting & Legal Affairs": 0.4244, "3. Infrastructure Development": 0.0344, "4. Land Coverage, Site Engineering & Architectural Design": 0.0773, "5. Planning & Historic Heritage": 0.0642}, 
+        {"year": 2024, "1. Environmental Management & Conservation": 0.2839, "2. Regulatory Compliance Permitting & Legal Affairs": 0.3045, "3. Infrastructure Development": 0.0478, "4. Land Coverage, Site Engineering & Architectural Design": 0.3188, "5. Planning & Historic Heritage": 0.0449}, 
+        {"year": 2025, "1. Environmental Management & Conservation": 0.2701, "2. Regulatory Compliance Permitting & Legal Affairs": 0.3975, "3. Infrastructure Development": 0.0375, "4. Land Coverage, Site Engineering & Architectural Design": 0.1736, "5. Planning & Historic Heritage": 0.1213}
+    ];
+
+    const keys = [
+        "1. Environmental Management & Conservation", 
+        "2. Regulatory Compliance Permitting & Legal Affairs", 
+        "3. Infrastructure Development", 
+        "4. Land Coverage, Site Engineering & Architectural Design", 
+        "5. Planning & Historic Heritage"
+    ];
+
+    // 2. Setup SVG dimensions
+    const width = 1000;
+    const height = 500;
+    const margin = { top: 20, right: 300, bottom: 40, left: 60 };
+
+    const svg = d3.select("#chart").append("svg")
+        .attr("viewBox", [0, 0, width, height])
+        .style("max-width", "100%")
+        .style("height", "auto");
+
+    // 3. Setup Scales
+    const x = d3.scaleLinear()
+        .domain(d3.extent(data, d => d.year))
+        .range([margin.left, width - margin.right]);
+
+    const color = d3.scaleOrdinal()
+        .domain(keys)
+        .range(["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854"]);
+
+    // 4. Setup Stack with WIGGLE offset
+    const stack = d3.stack()
+        .keys(keys)
+        .order(d3.stackOrderInsideOut)
+        .offset(d3.stackOffsetWiggle);
+
+    const series = stack(data);
+
+    // 5. Y-Scale needs dynamic extent due to Wiggle Offset
+    const y = d3.scaleLinear()
+        .domain([d3.min(series, d => d3.min(d, d => d[0])), d3.max(series, d => d3.max(d, d => d[1]))])
+        .range([height - margin.bottom, margin.top]);
+
+    // 6. Draw Axes
+    svg.append("g")
+        .attr("transform", `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(x).ticks(16).tickFormat(d3.format("d")))
+        .call(g => g.select(".domain").remove());
+
+    svg.append("g")
+        .attr("transform", `translate(${margin.left},0)`)
+        .call(d3.axisLeft(y).ticks(5))
+        .call(g => g.select(".domain").remove())
+        .call(g => g.append("text")
+            .attr("x", -margin.left)
+            .attr("y", 10)
+            .attr("fill", "currentColor")
+            .attr("text-anchor", "start")
+            .text("Theme Weight Distribution"));
+
+    // 7. Draw Stream Area with CATMULL-ROM curve
+    const area = d3.area()
+        .x(d => x(d.data.year))
+        .y0(d => y(d[0]))
+        .y1(d => y(d[1]))
+        .curve(d3.curveCatmullRom);
+
+    const tooltip = d3.select("#tooltip");
+
+    const paths = svg.append("g")
+        .selectAll("path")
+        .data(series)
+        .join("path")
+        .attr("fill", d => color(d.key))
+        .attr("d", area)
+        .style("cursor", "pointer")
+        .on("mousemove", function(event, d) {
+            paths.style("opacity", 0.2);
+            d3.select(this).style("opacity", 1);
+
+            const [mouseX, mouseY] = d3.pointer(event);
+            const year = Math.round(x.invert(mouseX));
+            
+            const yearData = data.find(item => item.year === year);
+            if(yearData) {
+                const value = yearData[d.key];
+                tooltip.style("opacity", 1)
+                    .html(`<strong>Year:</strong> ${year}<br><strong>Theme:</strong> ${d.key}<br><strong>Share:</strong> ${(value * 100).toFixed(1)}%`)
+                    .style("left", (event.pageX + 15) + "px")
+                    .style("top", (event.pageY - 28) + "px");
+            }
+        })
+        .on("mouseout", function() {
+            paths.style("opacity", 1);
+            tooltip.style("opacity", 0);
+        });
+
+    // 8. Draw Legend
+    const legend = svg.append("g")
+        .attr("transform", `translate(${width - margin.right + 20}, ${margin.top})`)
+        .attr("class", "legend")
+        .selectAll("g")
+        .data(keys.slice().reverse())
+        .join("g")
+        .attr("transform", (d, i) => `translate(0, ${i * 25})`);
+
+    legend.append("rect")
+        .attr("width", 15)
+        .attr("height", 15)
+        .attr("fill", color);
+
+    legend.append("text")
+        .attr("x", 24)
+        .attr("y", 8)
+        .attr("dy", "0.32em")
+        .text(d => d)
+        .style("font-size", "12px")
+        .call(wrap, 250); 
+
+    function wrap(text, width) {
+        text.each(function() {
+            let text = d3.select(this),
+                words = text.text().split(/\s+/).reverse(),
+                word,
+                line = [],
+                lineNumber = 0,
+                lineHeight = 1.1,
+                y = text.attr("y"),
+                dy = parseFloat(text.attr("dy")),
+                tspan = text.text(null).append("tspan").attr("x", 24).attr("y", y).attr("dy", dy + "em");
+            while (word = words.pop()) {
+                line.push(word);
+                tspan.text(line.join(" "));
+                if (tspan.node().getComputedTextLength() > width) {
+                    line.pop();
+                    tspan.text(line.join(" "));
+                    line = [word];
+                    tspan = text.append("tspan").attr("x", 24).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                }
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
