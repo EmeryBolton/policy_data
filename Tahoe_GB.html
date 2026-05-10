@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tahoe Governing Board Theme Trends (2010 - 2025)</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        body { font-family: sans-serif; background-color: #f9f9f9; padding: 20px; }
+        #chart-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 1000px; margin: auto; position: relative;}
+        .tooltip {
+            position: absolute;
+            text-align: left;
+            padding: 8px 12px;
+            font-size: 14px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            border-radius: 4px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        h2 { text-align: center; color: #333; }
+        .legend { font-size: 12px; }
+    </style>
+</head>
+<body>
+
+<div id="chart-container">
+    <h2>Tahoe Governing Board Theme Trends (2010 - 2025)</h2>
+    <div id="chart"></div>
+    <div id="tooltip" class="tooltip"></div>
+</div>
+
+<script>
+    // 1. Setup the data (Normalized to 100% per year)
+    const data = [
+        {"year": 2010, "1. Natural and Environmental Challenges": 0.0913, "2. Transportation Infrastructure & Planning": 0.1665, "3. Housing & Land Development": 0.3156, "4. Financial & Budget Operations": 0.1561, "5. Destination Governance, Engagement & Legal Compliance": 0.2705}, 
+        {"year": 2011, "1. Natural and Environmental Challenges": 0.2349, "2. Transportation Infrastructure & Planning": 0.055, "3. Housing & Land Development": 0.3484, "4. Financial & Budget Operations": 0.0455, "5. Destination Governance, Engagement & Legal Compliance": 0.3162}, 
+        {"year": 2012, "1. Natural and Environmental Challenges": 0.2121, "2. Transportation Infrastructure & Planning": 0.0708, "3. Housing & Land Development": 0.6312, "4. Financial & Budget Operations": 0.0176, "5. Destination Governance, Engagement & Legal Compliance": 0.0682}, 
+        {"year": 2013, "1. Natural and Environmental Challenges": 0.0552, "2. Transportation Infrastructure & Planning": 0.0757, "3. Housing & Land Development": 0.6452, "4. Financial & Budget Operations": 0.0391, "5. Destination Governance, Engagement & Legal Compliance": 0.1848}, 
+        {"year": 2014, "1. Natural and Environmental Challenges": 0.1184, "2. Transportation Infrastructure & Planning": 0.2207, "3. Housing & Land Development": 0.3211, "4. Financial & Budget Operations": 0.0329, "5. Destination Governance, Engagement & Legal Compliance": 0.3069}, 
+        {"year": 2015, "1. Natural and Environmental Challenges": 0.1969, "2. Transportation Infrastructure & Planning": 0.1879, "3. Housing & Land Development": 0.331, "4. Financial & Budget Operations": 0.0786, "5. Destination Governance, Engagement & Legal Compliance": 0.2056}, 
+        {"year": 2016, "1. Natural and Environmental Challenges": 0.1481, "2. Transportation Infrastructure & Planning": 0.3344, "3. Housing & Land Development": 0.2527, "4. Financial & Budget Operations": 0.0552, "5. Destination Governance, Engagement & Legal Compliance": 0.2095}, 
+        {"year": 2017, "1. Natural and Environmental Challenges": 0.102, "2. Transportation Infrastructure & Planning": 0.1952, "3. Housing & Land Development": 0.2582, "4. Financial & Budget Operations": 0.0447, "5. Destination Governance, Engagement & Legal Compliance": 0.3999}, 
+        {"year": 2018, "1. Natural and Environmental Challenges": 0.1365, "2. Transportation Infrastructure & Planning": 0.0812, "3. Housing & Land Development": 0.4879, "4. Financial & Budget Operations": 0.0931, "5. Destination Governance, Engagement & Legal Compliance": 0.2013}, 
+        {"year": 2019, "1. Natural and Environmental Challenges": 0.0998, "2. Transportation Infrastructure & Planning": 0.2226, "3. Housing & Land Development": 0.4104, "4. Financial & Budget Operations": 0.0967, "5. Destination Governance, Engagement & Legal Compliance": 0.1704}, 
+        {"year": 2020, "1. Natural and Environmental Challenges": 0.154, "2. Transportation Infrastructure & Planning": 0.2697, "3. Housing & Land Development": 0.21, "4. Financial & Budget Operations": 0.0628, "5. Destination Governance, Engagement & Legal Compliance": 0.3035}, 
+        {"year": 2021, "1. Natural and Environmental Challenges": 0.0893, "2. Transportation Infrastructure & Planning": 0.2193, "3. Housing & Land Development": 0.281, "4. Financial & Budget Operations": 0.0877, "5. Destination Governance, Engagement & Legal Compliance": 0.3226}, 
+        {"year": 2022, "1. Natural and Environmental Challenges": 0.1249, "2. Transportation Infrastructure & Planning": 0.1274, "3. Housing & Land Development": 0.3283, "4. Financial & Budget Operations": 0.0501, "5. Destination Governance, Engagement & Legal Compliance": 0.3693}, 
+        {"year": 2023, "1. Natural and Environmental Challenges": 0.0719, "2. Transportation Infrastructure & Planning": 0.3047, "3. Housing & Land Development": 0.273, "4. Financial & Budget Operations": 0.0946, "5. Destination Governance, Engagement & Legal Compliance": 0.2558}, 
+        {"year": 2024, "1. Natural and Environmental Challenges": 0.1307, "2. Transportation Infrastructure & Planning": 0.2002, "3. Housing & Land Development": 0.3405, "4. Financial & Budget Operations": 0.0596, "5. Destination Governance, Engagement & Legal Compliance": 0.269}, 
+        {"year": 2025, "1. Natural and Environmental Challenges": 0.1227, "2. Transportation Infrastructure & Planning": 0.2282, "3. Housing & Land Development": 0.3173, "4. Financial & Budget Operations": 0.0725, "5. Destination Governance, Engagement & Legal Compliance": 0.2592}
+    ];
+
+    const keys = [
+        "1. Natural and Environmental Challenges", 
+        "2. Transportation Infrastructure & Planning", 
+        "3. Housing & Land Development", 
+        "4. Financial & Budget Operations", 
+        "5. Destination Governance, Engagement & Legal Compliance"
+    ];
+
+    // 2. Setup SVG dimensions
+    const width = 1000;
+    const height = 500;
+    const margin = { top: 20, right: 300, bottom: 40, left: 60 };
+
+    const svg = d3.select("#chart").append("svg")
+        .attr("viewBox", [0, 0, width, height])
+        .style("max-width", "100%")
+        .style("height", "auto");
+
+    // 3. Setup Scales
+    const x = d3.scaleLinear()
+        .domain(d3.extent(data, d => d.year))
+        .range([margin.left, width - margin.right]);
+
+    const color = d3.scaleOrdinal()
+        .domain(keys)
+        .range(["#66c2a5", "#fc8d62", "#8da0cb", "#e78ac3", "#a6d854"]);
+
+    // 4. Setup Stack with WIGGLE offset
+    const stack = d3.stack()
+        .keys(keys)
+        .order(d3.stackOrderInsideOut)
+        .offset(d3.stackOffsetWiggle);
+
+    const series = stack(data);
+
+    // 5. Y-Scale needs dynamic extent due to Wiggle Offset
+    const y = d3.scaleLinear()
+        .domain([d3.min(series, d => d3.min(d, d => d[0])), d3.max(series, d => d3.max(d, d => d[1]))])
+        .range([height - margin.bottom, margin.top]);
+
+    // 6. Draw Axes
+    svg.append("g")
+        .attr("transform", `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(x).ticks(16).tickFormat(d3.format("d")))
+        .call(g => g.select(".domain").remove());
+
+    svg.append("g")
+        .attr("transform", `translate(${margin.left},0)`)
+        .call(d3.axisLeft(y).ticks(5))
+        .call(g => g.select(".domain").remove())
+        .call(g => g.append("text")
+            .attr("x", -margin.left)
+            .attr("y", 10)
+            .attr("fill", "currentColor")
+            .attr("text-anchor", "start")
+            .text("Theme Weight Distribution"));
+
+    // 7. Draw Stream Area with CATMULL-ROM curve
+    const area = d3.area()
+        .x(d => x(d.data.year))
+        .y0(d => y(d[0]))
+        .y1(d => y(d[1]))
+        .curve(d3.curveCatmullRom);
+
+    const tooltip = d3.select("#tooltip");
+
+    const paths = svg.append("g")
+        .selectAll("path")
+        .data(series)
+        .join("path")
+        .attr("fill", d => color(d.key))
+        .attr("d", area)
+        .style("cursor", "pointer")
+        .on("mousemove", function(event, d) {
+            paths.style("opacity", 0.2);
+            d3.select(this).style("opacity", 1);
+
+            const [mouseX, mouseY] = d3.pointer(event);
+            const year = Math.round(x.invert(mouseX));
+            
+            const yearData = data.find(item => item.year === year);
+            if(yearData) {
+                const value = yearData[d.key];
+                tooltip.style("opacity", 1)
+                    .html(`<strong>Year:</strong> ${year}<br><strong>Theme:</strong> ${d.key}<br><strong>Share:</strong> ${(value * 100).toFixed(1)}%`)
+                    .style("left", (event.pageX + 15) + "px")
+                    .style("top", (event.pageY - 28) + "px");
+            }
+        })
+        .on("mouseout", function() {
+            paths.style("opacity", 1);
+            tooltip.style("opacity", 0);
+        });
+
+    // 8. Draw Legend
+    const legend = svg.append("g")
+        .attr("transform", `translate(${width - margin.right + 20}, ${margin.top})`)
+        .attr("class", "legend")
+        .selectAll("g")
+        .data(keys.slice().reverse())
+        .join("g")
+        .attr("transform", (d, i) => `translate(0, ${i * 25})`);
+
+    legend.append("rect")
+        .attr("width", 15)
+        .attr("height", 15)
+        .attr("fill", color);
+
+    legend.append("text")
+        .attr("x", 24)
+        .attr("y", 8)
+        .attr("dy", "0.32em")
+        .text(d => d)
+        .style("font-size", "12px")
+        .call(wrap, 250); 
+
+    function wrap(text, width) {
+        text.each(function() {
+            let text = d3.select(this),
+                words = text.text().split(/\s+/).reverse(),
+                word,
+                line = [],
+                lineNumber = 0,
+                lineHeight = 1.1,
+                y = text.attr("y"),
+                dy = parseFloat(text.attr("dy")),
+                tspan = text.text(null).append("tspan").attr("x", 24).attr("y", y).attr("dy", dy + "em");
+            while (word = words.pop()) {
+                line.push(word);
+                tspan.text(line.join(" "));
+                if (tspan.node().getComputedTextLength() > width) {
+                    line.pop();
+                    tspan.text(line.join(" "));
+                    line = [word];
+                    tspan = text.append("tspan").attr("x", 24).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                }
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
