@@ -95,4 +95,104 @@
 
     // 6. Draw Axes
     svg.append("g")
-        .attr("transform",
+        .attr("transform", `translate(0,${height - margin.bottom})`)
+        .call(d3.axisBottom(x).ticks(16).tickFormat(d3.format("d")))
+        .call(g => g.select(".domain").remove());
+
+    svg.append("g")
+        .attr("transform", `translate(${margin.left},0)`)
+        .call(d3.axisLeft(y).ticks(5))
+        .call(g => g.select(".domain").remove())
+        .call(g => g.append("text")
+            .attr("x", -margin.left)
+            .attr("y", 10)
+            .attr("fill", "currentColor")
+            .attr("text-anchor", "start")
+            .text("Theme Weight Distribution"));
+
+    // 7. Draw Stream Area with CATMULL-ROM curve
+    const area = d3.area()
+        .x(d => x(d.data.year))
+        .y0(d => y(d[0]))
+        .y1(d => y(d[1]))
+        .curve(d3.curveCatmullRom);
+
+    const tooltip = d3.select("#tooltip");
+
+    const paths = svg.append("g")
+        .selectAll("path")
+        .data(series)
+        .join("path")
+        .attr("fill", d => color(d.key))
+        .attr("d", area)
+        .style("cursor", "pointer")
+        .on("mousemove", function(event, d) {
+            paths.style("opacity", 0.2);
+            d3.select(this).style("opacity", 1);
+
+            const [mouseX, mouseY] = d3.pointer(event);
+            const year = Math.round(x.invert(mouseX));
+            
+            const yearData = data.find(item => item.year === year);
+            if(yearData) {
+                const value = yearData[d.key];
+                tooltip.style("opacity", 1)
+                    .html(`<strong>Year:</strong> ${year}<br><strong>Theme:</strong> ${d.key}<br><strong>Share:</strong> ${(value * 100).toFixed(1)}%`)
+                    .style("left", (event.pageX + 15) + "px")
+                    .style("top", (event.pageY - 28) + "px");
+            }
+        })
+        .on("mouseout", function() {
+            paths.style("opacity", 1);
+            tooltip.style("opacity", 0);
+        });
+
+    // 8. Draw Legend
+    const legend = svg.append("g")
+        .attr("transform", `translate(${width - margin.right + 20}, ${margin.top})`)
+        .attr("class", "legend")
+        .selectAll("g")
+        .data(keys.slice().reverse())
+        .join("g")
+        .attr("transform", (d, i) => `translate(0, ${i * 25})`);
+
+    legend.append("rect")
+        .attr("width", 15)
+        .attr("height", 15)
+        .attr("fill", color);
+
+    legend.append("text")
+        .attr("x", 24)
+        .attr("y", 8)
+        .attr("dy", "0.32em")
+        .text(d => d)
+        .style("font-size", "12px")
+        .call(wrap, 250); 
+
+    function wrap(text, width) {
+        text.each(function() {
+            let text = d3.select(this),
+                words = text.text().split(/\s+/).reverse(),
+                word,
+                line = [],
+                lineNumber = 0,
+                lineHeight = 1.1,
+                y = text.attr("y"),
+                dy = parseFloat(text.attr("dy")),
+                tspan = text.text(null).append("tspan").attr("x", 24).attr("y", y).attr("dy", dy + "em");
+            while (word = words.pop()) {
+                line.push(word);
+                tspan.text(line.join(" "));
+                if (tspan.node().getComputedTextLength() > width) {
+                    line.pop();
+                    tspan.text(line.join(" "));
+                    line = [word];
+                    tspan = text.append("tspan").attr("x", 24).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+                }
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
